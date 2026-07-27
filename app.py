@@ -38,6 +38,46 @@ st.markdown("""
         border: 1px solid #e2e8f0;
     }
 
+    /* 결과 출력 카드 컨테이너 */
+    .result-card {
+        background-color: #ffffff;
+        border: 2px solid #22c55e;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(34, 197, 94, 0.12);
+    }
+
+    /* 테이블 행 정렬 보장 */
+    .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+    .info-table tr {
+        border-bottom: 1px dashed #e2e8f0;
+    }
+    .info-table tr:last-child {
+        border-bottom: none;
+    }
+    .info-table td {
+        padding: 12px 4px;
+        vertical-align: middle;
+    }
+    .td-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-align: left;
+        width: 35%;
+    }
+    .td-value {
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 1rem;
+        text-align: right;
+        width: 65%;
+    }
+
     /* 버튼 스타일 */
     .stButton > button {
         width: 100%;
@@ -179,37 +219,56 @@ if st.session_state.page == 'input':
                     st.error(f"데이터베이스 연결 중 오류가 발생했습니다: {str(e)}")
 
 # ----------------------------------------------------
-# PAGE 2: 회원 인증 완료 결과 전용 화면
+# PAGE 2: 회원 인증 완료 결과 전용 화면 (줄맞춤 완벽 보장)
 # ----------------------------------------------------
 elif st.session_state.page == 'result':
     res = st.session_state.auth_result
     
-    st.markdown("<h3 style='text-align: center; color: #0f172a; font-weight: 800; margin-bottom: 20px;'>울산피클볼협회</h3>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #0f172a; font-weight: 800; margin-bottom: 16px;'>울산피클볼협회</h2>", unsafe_allow_html=True)
     
-    # 순수 Streamlit 컴포넌트(st.container, st.columns)를 사용하여 깨짐 현상 완전 방지
-    with st.container():
-        st.success("✓ 회원 인증 완료")
-        st.markdown(f"<h2 style='text-align: center; margin-top: 10px;'><b>{res['name']}</b> 회원님</h2>", unsafe_allow_html=True)
-        st.markdown(f"<p style='text-align: center; color: #64748b;'>🏥 <b>{res['facility']}</b> 이용 승인</p>", unsafe_allow_html=True)
-        st.divider()
+    # HTML Table 구조로 구현하여 완벽한 행 높이 정렬
+    st.markdown(f"""
+    <div class="result-card">
+        <div style="background-color: #dcfce7; color: #15803d; font-weight: 700; font-size: 0.9rem; padding: 6px 16px; border-radius: 20px; text-align: center; width: fit-content; margin: 0 auto 12px auto;">
+            ✓ 회원 인증 완료
+        </div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 4px;">
+            {res['name']} 회원님
+        </div>
+        <div style="font-size: 0.95rem; color: #64748b; text-align: center; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
+            🏥 {res['facility']} 이용 승인
+        </div>
+        
+        <table class="info-table">
+            <tr>
+                <td class="td-label">소속 클럽</td>
+                <td class="td-value">{res['clubs']}</td>
+            </tr>
+            <tr>
+                <td class="td-label">회원 자격</td>
+                <td class="td-value" style="color: #22c55e;">{res['status']}</td>
+            </tr>
+            <tr>
+                <td class="td-label">생년월일</td>
+                <td class="td-value">{res['birth']}</td>
+            </tr>
+            <tr>
+                <td class="td-label">연락처</td>
+                <td class="td-value">{res['phone']}</td>
+            </tr>
+            <tr>
+                <td class="td-label">가입일</td>
+                <td class="td-value">{res['join_date']}</td>
+            </tr>
+            <tr>
+                <td class="td-label">인증 일시</td>
+                <td class="td-value" style="font-size: 0.85rem; color: #64748b; font-weight: 500;">{res['time']}</td>
+            </tr>
+        </table>
+    </div>
+    """, unsafe_allow_html=True)
 
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            st.markdown("**소속 클럽**")
-            st.markdown("**회원 자격**")
-            st.markdown("**생년월일**")
-            st.markdown("**연락처**")
-            st.markdown("**가입일**")
-            st.markdown("**인증 일시**")
-        with col2:
-            st.markdown(f"<div style='text-align: right;'>{res['clubs']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='text-align: right; color: #22c55e; font-weight: bold;'>{res['status']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='text-align: right;'>{res['birth']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='text-align: right;'>{res['phone']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='text-align: right;'>{res['join_date']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='text-align: right; font-size: 0.8rem; color: #64748b;'>{res['time']}</div>", unsafe_allow_html=True)
-
-    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
     
     if st.button("🔄 다른 회원 조회하기"):
         st.session_state.page = 'input'
