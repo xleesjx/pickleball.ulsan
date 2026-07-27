@@ -3,7 +3,7 @@ from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 from datetime import datetime
 
-# Page configuration
+# Page configuration for Mobile View
 st.set_page_config(
     page_title="울산피클볼협회 회원 인증",
     page_icon="🏓",
@@ -11,47 +11,102 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS: Modern 2026 App UI Style & Hide Streamlit Branding
+# Custom CSS: Ultra-compact Mobile UI & Perfect Alignment
 st.markdown("""
 <style>
-    /* Hide Streamlit Elements */
+    /* Hide Streamlit Header & Footer */
     #MainMenu, footer, header {visibility: hidden;}
     
-    /* Background & Container */
+    /* Background & Container setup for Mobile Single Screen */
     .stApp {
-        background-color: #f1f5f9;
+        background-color: #f8fafc;
     }
     .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        max-width: 440px;
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+        padding-left: 0.8rem !important;
+        padding-right: 0.8rem !important;
+        max-width: 400px !important;
     }
 
-    /* Input Form Styling */
+    /* Input Form Mobile Tuning */
     div[data-testid="stForm"] {
         background-color: #ffffff;
-        border-radius: 20px;
-        padding: 24px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px 18px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid #cbd5e1;
+    }
+    div[data-testid="stForm"] label {
+        font-size: 0.88rem !important;
+        font-weight: 700 !important;
+        color: #334155 !important;
+        margin-bottom: 2px !important;
+    }
+    div[data-testid="stForm"] input {
+        padding: 6px 10px !important;
+        font-size: 0.95rem !important;
     }
 
-    /* Buttons */
+    /* Result Card Layout (Flexbox List) */
+    .mobile-card {
+        background-color: #ffffff;
+        border: 2px solid #22c55e;
+        border-radius: 18px;
+        padding: 18px 16px;
+        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.12);
+    }
+    
+    .status-pill {
+        display: inline-block;
+        background-color: #dcfce7;
+        color: #15803d;
+        font-weight: 800;
+        font-size: 0.85rem;
+        padding: 4px 14px;
+        border-radius: 12px;
+        margin-bottom: 8px;
+    }
+
+    /* Mobile Compact List Item */
+    .mobile-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+    .mobile-row:last-child {
+        border-bottom: none;
+    }
+    .row-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .row-value {
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-align: right;
+        word-break: keep-all;
+    }
+
+    /* Button Mobile Optimization */
     .stButton > button {
         width: 100%;
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        background-color: #2563eb;
         color: white;
-        font-weight: 700;
-        font-size: 1.05rem;
-        padding: 0.8rem;
-        border-radius: 14px;
+        font-weight: 800;
+        font-size: 1rem;
+        padding: 0.65rem;
+        border-radius: 12px;
         border: none;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
     .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        background-color: #1d4ed8;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -62,18 +117,18 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 def load_data(sheet_name):
     return conn.read(worksheet=sheet_name, ttl=0)
 
-# 세션 상태 초기화 (페이지 전환용)
+# 세션 상태 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'input'
 if 'auth_result' not in st.session_state:
     st.session_state.auth_result = None
 
 # ----------------------------------------------------
-# PAGE 1: 회원 인증 입력 화면
+# PAGE 1: 회원 인증 입력 화면 (모바일 스크롤 최소화)
 # ----------------------------------------------------
 if st.session_state.page == 'input':
-    st.markdown("<h2 style='text-align: center; color: #0f172a; font-weight: 800; margin-bottom: 2px;'>울산피클볼협회</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b; font-size: 0.95rem; font-weight: 600; margin-bottom: 24px;'>모바일 회원 인증 서비스</p>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #0f172a; font-weight: 800; margin-top: 0px; margin-bottom: 2px;'>울산피클볼협회</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 12px;'>회원 인증 서비스</p>", unsafe_allow_html=True)
 
     try:
         config_df = load_data("설정")
@@ -86,10 +141,10 @@ if st.session_state.page == 'input':
     with st.form("auth_form", clear_on_submit=False):
         selected_facility = st.selectbox("🏥 이용할 협약기관", facility_list)
         user_name = st.text_input("👤 이름", placeholder="예: 홍길동").strip()
-        birth_input = st.text_input("📅 생년월일 6자리 (예: 980101)", placeholder="980101", max_chars=6).strip()
-        phone_last4 = st.text_input("📱 전화번호 뒷 4자리", placeholder="1234", max_chars=4).strip()
+        birth_input = st.text_input("📅 생년월일 6자리", placeholder="예: 980101", max_chars=6).strip()
+        phone_last4 = st.text_input("📱 전화번호 뒷 4자리", placeholder="예: 1234", max_chars=4).strip()
         
-        st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
         submit_button = st.form_submit_button("회원 인증 조회")
 
     if submit_button:
@@ -100,7 +155,7 @@ if st.session_state.page == 'input':
         elif not phone_last4.isdigit() or len(phone_last4) != 4:
             st.error("전화번호 뒷자리는 4자리 숫자로 입력해주세요. (예: 1234)")
         else:
-            with st.spinner("회원 정보를 확인하고 있습니다..."):
+            with st.spinner("회원 정보 확인 중..."):
                 try:
                     members_df = load_data("통합관리")
                     
@@ -154,7 +209,7 @@ if st.session_state.page == 'input':
                         st.rerun()
 
                     else:
-                        st.error("❌ 일치하는 회원 정보가 없습니다. 입력한 정보를 확인해 주세요.")
+                        st.error("❌ 일치하는 회원 정보가 없습니다.")
                         try:
                             log_entry = pd.DataFrame([{
                                 "조회일시": current_time,
@@ -170,48 +225,57 @@ if st.session_state.page == 'input':
                             pass
 
                 except Exception as e:
-                    st.error(f"데이터베이스 연결 중 오류가 발생했습니다: {str(e)}")
+                    st.error(f"데이터베이스 연결 오류: {str(e)}")
 
 # ----------------------------------------------------
-# PAGE 2: 회원 인증 완료 결과 전용 화면 (Native Pure UI)
+# PAGE 2: 회원 인증 완료 결과 전용 화면 (모바일 1화면 최적화)
 # ----------------------------------------------------
 elif st.session_state.page == 'result':
     res = st.session_state.auth_result
     
-    st.markdown("<h3 style='text-align: center; color: #64748b; font-size: 1rem; font-weight: 700; margin-bottom: 12px;'>울산피클볼협회</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #0f172a; font-weight: 800; margin-top: 0px; margin-bottom: 12px;'>울산피클볼협회</h3>", unsafe_allow_html=True)
     
-    # 렌더링 깨짐 현상을 방지하기 위한 Pure Streamlit Container
-    with st.container(border=True):
-        st.success("✓ 모바일 회원 인증 완료")
-        st.markdown(f"<h1 style='text-align: center; color: #0f172a; margin-top: 10px; margin-bottom: 2px;'>{res['name']} <span style='font-size: 1.2rem; font-weight: normal;'>회원님</span></h1>", unsafe_allow_html=True)
-        st.markdown(f"<p style='text-align: center; color: #2563eb; font-weight: 700; margin-bottom: 15px;'>🏥 {res['facility']} 이용 승인</p>", unsafe_allow_html=True)
+    # 100% 밀착 Flexbox 구조
+    st.markdown(f"""
+    <div class="mobile-card">
+        <div style="text-align: center;">
+            <span class="status-pill">✓ 모바일 회원 인증 완료</span>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-top: 2px;">
+                {res['name']} <span style="font-size: 1.1rem; font-weight: normal; color: #475569;">회원님</span>
+            </div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: #2563eb; margin-bottom: 12px;">
+                🏥 {res['facility']} 이용 승인
+            </div>
+        </div>
         
-        st.divider()
+        <div class="mobile-row">
+            <span class="row-label">소속 클럽</span>
+            <span class="row-value">{res['clubs']}</span>
+        </div>
+        <div class="mobile-row">
+            <span class="row-label">회원 자격</span>
+            <span class="row-value" style="color: #16a34a;">{res['status']}</span>
+        </div>
+        <div class="mobile-row">
+            <span class="row-label">생년월일</span>
+            <span class="row-value">{res['birth']}</span>
+        </div>
+        <div class="mobile-row">
+            <span class="row-label">연락처</span>
+            <span class="row-value">{res['phone']}</span>
+        </div>
+        <div class="mobile-row">
+            <span class="row-label">가입일</span>
+            <span class="row-value">{res['join_date']}</span>
+        </div>
+        <div class="mobile-row">
+            <span class="row-label">인증 일시</span>
+            <span class="row-value" style="font-size: 0.8rem; color: #64748b; font-weight: 500;">{res['time']}</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        # Pure Native Metrics/Columns로 완벽한 줄맞춤
-        items = [
-            ("소속 클럽", res['clubs']),
-            ("회원 자격", res['status']),
-            ("생년월일", res['birth']),
-            ("연락처", res['phone']),
-            ("가입일", res['join_date']),
-            ("인증 일시", res['time'])
-        ]
-
-        for label, val in items:
-            c1, c2 = st.columns([4, 6])
-            with c1:
-                st.markdown(f"<p style='color: #64748b; font-weight: 600; margin: 0;'>{label}</p>", unsafe_allow_html=True)
-            with c2:
-                if label == "회원 자격":
-                    st.markdown(f"<p style='text-align: right; color: #16a34a; font-weight: 800; margin: 0;'>{val}</p>", unsafe_allow_html=True)
-                elif label == "인증 일시":
-                    st.markdown(f"<p style='text-align: right; color: #94a3b8; font-size: 0.85rem; margin: 0;'>{val}</p>", unsafe_allow_html=True)
-                else:
-                    st.markdown(f"<p style='text-align: right; color: #0f172a; font-weight: 700; margin: 0;'>{val}</p>", unsafe_allow_html=True)
-            st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True)
-
-    st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
     
     if st.button("🔄 다른 회원 조회하기"):
         st.session_state.page = 'input'
