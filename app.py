@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS: Ultra-compact Mobile UI & Perfect Alignment
+# Custom CSS for Modern Mobile UI (Pure Native Styling)
 st.markdown("""
 <style>
     /* Hide Streamlit Header & Footer */
@@ -22,91 +22,73 @@ st.markdown("""
         background-color: #f8fafc;
     }
     .main .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-        padding-left: 0.8rem !important;
-        padding-right: 0.8rem !important;
-        max-width: 400px !important;
+        padding-top: 1.2rem !important;
+        padding-bottom: 1.2rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-width: 420px !important;
     }
 
-    /* Input Form Mobile Tuning */
-    div[data-testid="stForm"] {
-        background-color: #ffffff;
-        border-radius: 16px;
-        padding: 16px 18px !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        border: 1px solid #cbd5e1;
+    /* Input Form & Card Containers */
+    div[data-testid="stForm"], div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #ffffff !important;
+        border-radius: 18px !important;
+        padding: 20px 16px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+        border: 1px solid #cbd5e1 !important;
     }
+
+    /* Form Fields Styling */
     div[data-testid="stForm"] label {
         font-size: 0.88rem !important;
         font-weight: 700 !important;
         color: #334155 !important;
-        margin-bottom: 2px !important;
-    }
-    div[data-testid="stForm"] input {
-        padding: 6px 10px !important;
-        font-size: 0.95rem !important;
     }
 
-    /* Result Card Layout (Flexbox List) */
-    .mobile-card {
-        background-color: #ffffff;
-        border: 2px solid #22c55e;
-        border-radius: 18px;
-        padding: 18px 16px;
-        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.12);
-    }
-    
-    .status-pill {
-        display: inline-block;
-        background-color: #dcfce7;
-        color: #15803d;
-        font-weight: 800;
-        font-size: 0.85rem;
-        padding: 4px 14px;
-        border-radius: 12px;
-        margin-bottom: 8px;
-    }
-
-    /* Mobile Compact List Item */
-    .mobile-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 0;
-        border-bottom: 1px dashed #e2e8f0;
-    }
-    .mobile-row:last-child {
-        border-bottom: none;
-    }
-    .row-label {
-        color: #64748b;
-        font-weight: 600;
-        font-size: 0.9rem;
-        flex-shrink: 0;
-    }
-    .row-value {
-        color: #0f172a;
-        font-weight: 700;
-        font-size: 0.95rem;
-        text-align: right;
-        word-break: keep-all;
-    }
-
-    /* Button Mobile Optimization */
+    /* Mobile Compact Button */
     .stButton > button {
         width: 100%;
         background-color: #2563eb;
         color: white;
         font-weight: 800;
         font-size: 1rem;
-        padding: 0.65rem;
+        padding: 0.7rem;
         border-radius: 12px;
         border: none;
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
     .stButton > button:hover {
         background-color: #1d4ed8;
+    }
+
+    /* Metrics & Custom Text Helpers */
+    .title-text {
+        text-align: center;
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 1.3rem;
+        margin-bottom: 2px;
+    }
+    .subtitle-text {
+        text-align: center;
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-bottom: 14px;
+    }
+    .user-header {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-top: 4px;
+        margin-bottom: 2px;
+    }
+    .facility-header {
+        text-align: center;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #2563eb;
+        margin-bottom: 12px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -124,11 +106,11 @@ if 'auth_result' not in st.session_state:
     st.session_state.auth_result = None
 
 # ----------------------------------------------------
-# PAGE 1: 회원 인증 입력 화면 (모바일 스크롤 최소화)
+# PAGE 1: 회원 인증 입력 화면
 # ----------------------------------------------------
 if st.session_state.page == 'input':
-    st.markdown("<h3 style='text-align: center; color: #0f172a; font-weight: 800; margin-top: 0px; margin-bottom: 2px;'>울산피클볼협회</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 12px;'>회원 인증 서비스</p>", unsafe_allow_html=True)
+    st.markdown('<div class="title-text">울산피클볼협회</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle-text">회원 인증 서비스</div>', unsafe_allow_html=True)
 
     try:
         config_df = load_data("설정")
@@ -228,54 +210,42 @@ if st.session_state.page == 'input':
                     st.error(f"데이터베이스 연결 오류: {str(e)}")
 
 # ----------------------------------------------------
-# PAGE 2: 회원 인증 완료 결과 전용 화면 (모바일 1화면 최적화)
+# PAGE 2: 회원 인증 완료 결과 화면 (Streamlit Pure Component)
 # ----------------------------------------------------
 elif st.session_state.page == 'result':
     res = st.session_state.auth_result
     
-    st.markdown("<h3 style='text-align: center; color: #0f172a; font-weight: 800; margin-top: 0px; margin-bottom: 12px;'>울산피클볼협회</h3>", unsafe_allow_html=True)
-    
-    # 100% 밀착 Flexbox 구조
-    st.markdown(f"""
-    <div class="mobile-card">
-        <div style="text-align: center;">
-            <span class="status-pill">✓ 모바일 회원 인증 완료</span>
-            <div style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-top: 2px;">
-                {res['name']} <span style="font-size: 1.1rem; font-weight: normal; color: #475569;">회원님</span>
-            </div>
-            <div style="font-size: 0.9rem; font-weight: 700; color: #2563eb; margin-bottom: 12px;">
-                🏥 {res['facility']} 이용 승인
-            </div>
-        </div>
-        
-        <div class="mobile-row">
-            <span class="row-label">소속 클럽</span>
-            <span class="row-value">{res['clubs']}</span>
-        </div>
-        <div class="mobile-row">
-            <span class="row-label">회원 자격</span>
-            <span class="row-value" style="color: #16a34a;">{res['status']}</span>
-        </div>
-        <div class="mobile-row">
-            <span class="row-label">생년월일</span>
-            <span class="row-value">{res['birth']}</span>
-        </div>
-        <div class="mobile-row">
-            <span class="row-label">연락처</span>
-            <span class="row-value">{res['phone']}</span>
-        </div>
-        <div class="mobile-row">
-            <span class="row-label">가입일</span>
-            <span class="row-value">{res['join_date']}</span>
-        </div>
-        <div class="mobile-row">
-            <span class="row-label">인증 일시</span>
-            <span class="row-value" style="font-size: 0.8rem; color: #64748b; font-weight: 500;">{res['time']}</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="title-text">울산피클볼협회</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle-text">회원 인증 완료</div>', unsafe_allow_html=True)
 
-    st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
+    # 순수 Streamlit border container 활용 (HTML 코드가 절대 노출되지 않음)
+    with st.container(border=True):
+        st.success("✓ 모바일 회원 인증이 완료되었습니다.")
+        st.markdown(f'<div class="user-header">{res["name"]} <span style="font-size: 1.1rem; font-weight: normal; color: #475569;">회원님</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="facility-header">🏥 {res["facility"]} 이용 승인</div>', unsafe_allow_html=True)
+        st.divider()
+
+        # Pure Streamlit Columns로 안전한 레이아웃 구성
+        def render_row(label, val, is_highlight=False, is_small=False):
+            c1, c2 = st.columns([4, 6])
+            with c1:
+                st.markdown(f"**{label}**")
+            with c2:
+                if is_highlight:
+                    st.markdown(f":green[**{val}**]")
+                elif is_small:
+                    st.caption(val)
+                else:
+                    st.markdown(f"**{val}**")
+
+        render_row("소속 클럽", res['clubs'])
+        render_row("회원 자격", res['status'], is_highlight=True)
+        render_row("생년월일", res['birth'])
+        render_row("연락처", res['phone'])
+        render_row("가입일", res['join_date'])
+        render_row("인증 일시", res['time'], is_small=True)
+
+    st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
     
     if st.button("🔄 다른 회원 조회하기"):
         st.session_state.page = 'input'
