@@ -11,54 +11,81 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 구글 드라이브 로고 원본 파일 ID 적용
+# 구글 드라이브 로고 ID (구글 공식 CDN 직링크 및 썸네일 백업 적용)
 FILE_ID = "1qRvmGoexXsmzAu5zpBR0Gb6y7a1hn1bv"
-LOGO_URL = f"https://drive.google.com/uc?export=view&id={FILE_ID}"
+LOGO_URL = f"https://lh3.googleusercontent.com/d/{FILE_ID}"
+LOGO_FALLBACK = f"https://drive.google.com/thumbnail?id={FILE_ID}&sz=w500"
 
 # ==========================================
-# 🎨 UI 최적화 및 문제 해결 CSS
+# 🎨 상단 여백 완벽 제거 및 모바일 최적화 CSS
 # ==========================================
 st.markdown("""
 <style>
-/* 1. 스트림릿 기본 UI 요소를 완벽 숨김 (우측 하단 아이콘 포함) */
-[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stAppDeployButton"] {display: none !important;}
-footer, #MainMenu {visibility: hidden !important; display: none !important;}
-.viewerBadge_container__1X33n, .viewerBadge_link__1S137, [data-testid="stDecoration"] {display: none !important;}
-.stDeployButton {display: none !important;}
+/* 1. 스트림릿 헤더, 툴바, 푸터, 우측하단 Deploy 버튼 완벽 차단 */
+[data-testid="stHeader"], 
+[data-testid="stToolbar"], 
+[data-testid="stAppDeployButton"],
+.stDeployButton,
+footer, 
+#MainMenu, 
+.viewerBadge_container__1X33n, 
+.viewerBadge_link__1S137, 
+[data-testid="stDecoration"] {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
 
-/* 2. 상단 불필요한 여백 제거 및 전체 배경색 */
-.stApp { background-color: #f3f6f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-.main .block-container {
-    padding-top: 0.5rem !important; /* 상단 여백을 극단적으로 줄임 */
-    padding-bottom: 2rem !important;
-    max-width: 420px !important;
+/* 2. 상단 불필요한 여백(Padding/Margin) 0px 박멸 - 모바일 스크롤 방지 */
+.stApp { 
+    background-color: #f3f6f9 !important; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
     margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+div[data-testid="stAppViewContainer"] {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+.main .block-container, 
+[data-testid="stMainBlockContainer"], 
+div[data-testid="stAppViewBlockContainer"] {
+    padding-top: 0.2rem !important; /* 모바일에서 스크롤 없이 첫 화면에 쏙 들어오게 설정 */
+    padding-bottom: 1rem !important;
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
 }
 
 /* 3. 모던 카드형 디자인 */
 div[data-testid="stForm"], .result-card {
     background-color: #ffffff !important;
     border-radius: 24px !important;
-    padding: 28px 22px !important;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05) !important;
+    padding: 22px 18px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
     border: none !important;
 }
 
 /* 4. 입력 폼 라벨 최적화 */
 div[data-testid="stForm"] label {
-    font-size: 0.88rem !important;
+    font-size: 0.85rem !important;
     font-weight: 700 !important;
     color: #475569 !important;
-    margin-bottom: 6px !important;
+    margin-bottom: 4px !important;
 }
 
-/* 5. 이중 테두리 문제 해결 및 깔끔한 입력창 디자인 */
+/* 5. 이중 테두리 제거 및 단일 보더 처리 */
 div[data-baseweb="input"], div[data-baseweb="select"] > div {
     border-radius: 12px !important;
     border: 1px solid #cbd5e1 !important;
     background-color: #f8fafc !important;
     box-shadow: none !important;
-    transition: all 0.2s ease;
+    outline: none !important;
 }
 div[data-baseweb="input"]:focus-within, div[data-baseweb="select"] > div:focus-within {
     border-color: #3b82f6 !important;
@@ -67,39 +94,39 @@ div[data-baseweb="input"]:focus-within, div[data-baseweb="select"] > div:focus-w
 }
 div[data-baseweb="base-input"] {
     background-color: transparent !important;
+    border: none !important;
 }
 div[data-baseweb="base-input"] > input {
     color: #0f172a !important;
+    border: none !important;
 }
 
-/* 6. "Press Enter to apply" 등 안내 문구 숨김 */
-div[data-testid="InputInstructions"], small {
+/* 6. "Press Enter to apply" 등 영문 안내 문구 차단 */
+div[data-testid="InputInstructions"], small, [data-testid="stInputInstruction"] {
     display: none !important;
 }
 
-/* 7. 트렌디한 둥근 버튼 */
+/* 7. 중앙 정렬 둥근 버튼 */
 div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] {
     display: flex !important;
     justify-content: center !important;
-    margin-top: 16px !important;
+    margin-top: 14px !important;
 }
 .stButton > button {
     background-color: #2563eb !important;
     color: #ffffff !important;
     font-weight: 800 !important;
-    font-size: 1.05rem !important;
-    padding: 0.75rem 2.5rem !important;
+    font-size: 1rem !important;
+    padding: 0.7rem 2.2rem !important;
     border-radius: 9999px !important;
     border: none !important;
     box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25) !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all 0.2s ease !important;
     width: auto !important;
-    min-width: 160px !important;
+    min-width: 150px !important;
 }
 .stButton > button:hover {
     background-color: #1d4ed8 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3) !important;
 }
 
 /* 8. 결과 정보 리스트 디자인 */
@@ -107,22 +134,22 @@ div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] {
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 16px;
-    padding: 14px 18px;
-    margin-top: 16px;
+    padding: 12px 16px;
+    margin-top: 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
 .res-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 9px 0;
     border-bottom: 1px solid #f1f5f9;
 }
 .res-row:last-child { border-bottom: none; }
-.res-label { color: #64748b; font-size: 0.88rem; font-weight: 600; }
-.res-val { color: #0f172a; font-size: 0.95rem; font-weight: 800; }
-.badge-blue { background-color: #eff6ff; color: #2563eb; font-weight: 800; font-size: 0.8rem; padding: 4px 12px; border-radius: 9999px; }
-.badge-green { background-color: #f0fdf4; color: #16a34a; font-weight: 800; font-size: 0.8rem; padding: 4px 12px; border-radius: 9999px; }
+.res-label { color: #64748b; font-size: 0.85rem; font-weight: 600; }
+.res-val { color: #0f172a; font-size: 0.92rem; font-weight: 800; }
+.badge-blue { background-color: #eff6ff; color: #2563eb; font-weight: 800; font-size: 0.78rem; padding: 4px 10px; border-radius: 9999px; }
+.badge-green { background-color: #f0fdf4; color: #16a34a; font-weight: 800; font-size: 0.78rem; padding: 4px 10px; border-radius: 9999px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -138,15 +165,15 @@ if 'auth_result' not in st.session_state:
     st.session_state.auth_result = None
 
 # ==========================================
-# ⚠️ [중요] 코드 노출 방지를 위해 HTML 내 들여쓰기 100% 제거
+# ⚠️ 코드 노출 방지를 위해 HTML 내 들여쓰기 완전 제거 + 이미지 엑박 차단
 # ==========================================
 def render_header():
-    html_header = f"""<div style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
-<div style="display: inline-block; width: 80px; height: 80px; background-color: #ffffff; border-radius: 40px; padding: 4px; box-shadow: 0 6px 16px rgba(0,0,0,0.06); margin-bottom: 12px;">
-<img src="{LOGO_URL}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
+    html_header = f"""<div style="text-align: center; margin-top: 0px; margin-bottom: 14px;">
+<div style="display: inline-block; width: 72px; height: 72px; background-color: #ffffff; border-radius: 36px; padding: 4px; box-shadow: 0 6px 16px rgba(0,0,0,0.06); margin-bottom: 8px;">
+<img src="{LOGO_URL}" onerror="this.onerror=null; this.src='{LOGO_FALLBACK}';" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
 </div>
-<h2 style="font-weight: 800; color: #0f172a; margin: 0; font-size: 1.45rem; letter-spacing: -0.5px;">울산피클볼협회</h2>
-<p style="font-weight: 700; color: #3b82f6; margin-top: 4px; margin-bottom: 0; font-size: 1rem;">회원인증 서비스</p>
+<h2 style="font-weight: 800; color: #0f172a; margin: 0; font-size: 1.35rem; letter-spacing: -0.5px;">울산피클볼협회</h2>
+<p style="font-weight: 700; color: #3b82f6; margin-top: 2px; margin-bottom: 0; font-size: 0.95rem;">회원인증 서비스</p>
 </div>"""
     st.markdown(html_header, unsafe_allow_html=True)
 
@@ -158,7 +185,7 @@ if st.session_state.page == 'input':
     with st.container():
         render_header()
         
-        html_desc = """<p style="text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 0; margin-bottom: 18px;">회원 정보를 입력하고 자격을 확인하세요</p>"""
+        html_desc = """<p style="text-align: center; color: #64748b; font-size: 0.82rem; margin-top: 0; margin-bottom: 14px;">회원 정보를 입력하고 자격을 확인하세요</p>"""
         st.markdown(html_desc, unsafe_allow_html=True)
 
         try:
@@ -256,7 +283,7 @@ if st.session_state.page == 'input':
                     st.error(f"데이터베이스 연결 오류: {str(e)}")
 
 # ----------------------------------------------------
-# PAGE 2: 회원 인증 완료 결과 화면 (코드 노출 원천 차단)
+# PAGE 2: 회원 인증 완료 결과 화면
 # ----------------------------------------------------
 elif st.session_state.page == 'result':
     res = st.session_state.auth_result
@@ -265,20 +292,20 @@ elif st.session_state.page == 'result':
         render_header()
         
         result_html = f"""<div class="result-card">
-<div style="text-align: center; margin-bottom: 16px;">
-<span style="background-color: #eff6ff; color: #2563eb; font-weight: 800; font-size: 0.85rem; padding: 6px 16px; border-radius: 9999px; border: 1px solid #dbeafe;">
+<div style="text-align: center; margin-bottom: 14px;">
+<span style="background-color: #eff6ff; color: #2563eb; font-weight: 800; font-size: 0.82rem; padding: 5px 14px; border-radius: 9999px; border: 1px solid #dbeafe;">
 {res['facility']} 제출용
 </span>
 </div>
-<div style="text-align: center; margin-bottom: 10px;">
-<div style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);">
-<span style="color: #ffffff; font-size: 1.6rem; font-weight: bold;">✓</span>
+<div style="text-align: center; margin-bottom: 8px;">
+<div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);">
+<span style="color: #ffffff; font-size: 1.5rem; font-weight: bold;">✓</span>
 </div>
 </div>
-<div style="text-align: center; font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 2px; letter-spacing: -0.5px;">
+<div style="text-align: center; font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 2px; letter-spacing: -0.5px;">
 인증 완료
 </div>
-<div style="text-align: center; font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">
+<div style="text-align: center; font-size: 0.82rem; color: #64748b; margin-bottom: 14px;">
 정상적으로 회원 정보가 확인되었습니다
 </div>
 <div class="res-box">
@@ -292,7 +319,7 @@ elif st.session_state.page == 'result':
 </div>"""
         st.markdown(result_html, unsafe_allow_html=True)
 
-        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         c1, c2, c3 = st.columns([1, 2, 1])
         with c2:
             if st.button("다시 인증하기"):
