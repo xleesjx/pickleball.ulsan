@@ -343,7 +343,7 @@
       fetchFacilities();
     });
 
-    // 협약기관 목록 불러오기 API
+    // 협약기관 목록 불러오기 API (개인정보 없음 → GET 방식 유지)
     function fetchFacilities() {
       if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("★")) return;
 
@@ -364,7 +364,7 @@
         .catch(err => console.error("기관 목록 로드 실패:", err));
     }
 
-    // 회원 인증 처리
+    // 회원 인증 처리 (개인정보 보호를 위해 POST 방식으로 전송)
     function handleAuth(event) {
       event.preventDefault();
 
@@ -372,7 +372,7 @@
       const userName = document.getElementById('userName').value.trim();
       const birth = document.getElementById('birth').value.trim();
       const phoneLast4 = document.getElementById('phoneLast4').value.trim();
-      
+
       const errorEl = document.getElementById('error-msg');
       const btnSubmit = document.getElementById('btn-submit');
 
@@ -391,9 +391,24 @@
       btnSubmit.textContent = "확인 중...";
       btnSubmit.disabled = true;
 
-      const requestUrl = `${GAS_WEB_APP_URL}?action=verifyMember&facility=${encodeURIComponent(facility)}&name=${encodeURIComponent(userName)}&birth=${encodeURIComponent(birth)}&phoneLast4=${encodeURIComponent(phoneLast4)}`;
+      // 개인정보(이름/생년월일/전화번호)는 URL이 아닌 요청 본문(body)에 담아서 전송합니다.
+      const payload = {
+        action: "verifyMember",
+        facility: facility,
+        name: userName,
+        birth: birth,
+        phoneLast4: phoneLast4
+      };
 
-      fetch(requestUrl)
+      fetch(GAS_WEB_APP_URL, {
+        method: "POST",
+        headers: {
+          // GAS는 application/json 요청에 대한 사전확인(preflight)을 지원하지 않으므로
+          // text/plain으로 전송하고, 서버 쪽에서 JSON.parse로 직접 해석합니다.
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      })
         .then(res => res.json())
         .then(data => {
           btnSubmit.textContent = "인증하기";
@@ -443,3 +458,4 @@
   </script>
 </body>
 </html>
+
