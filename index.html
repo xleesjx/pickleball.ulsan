@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>
+    // ⚠️ 구글 앱스크립트에서 복사한 '웹 앱 URL'을 아래 따옴표 안에 붙여넣으세요!
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxx578rEaOC-T__98oU8igemxo-nTlxJd7kPQLIONh6WHte9dHs4-eEupA6K0lpCumshA/exec";
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>울산피클볼협회 회원 인증</title>
+  <style>
+    /* 1. 리셋 및 기본 설정 (상단 여백 0px 완벽 구현) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f3f6f9;
+      color: #0f172a;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 10px 16px 30px 16px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* 2. 헤더 디자인 */
+    .header {
+      text-align: center;
+      margin-top: 4px;
+      margin-bottom: 16px;
+    }
+
+    .logo-box {
+      display: inline-block;
+      width: 80px;
+      height: 80px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      padding: 4px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+      margin-bottom: 8px;
+    }
+
+    .logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    .title {
+      font-weight: 800;
+      color: #0f172a;
+      font-size: 1.45rem;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-weight: 700;
+      color: #3b82f6;
+      margin-top: 3px;
+      font-size: 1rem;
+    }
+
+    .description {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+    }
+
+    /* 3. 카드 공통 스타일 (시안 100% 반영) */
+    .card {
+      background-color: #ffffff;
+      border-radius: 28px;
+      padding: 24px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    }
+
+    /* 4. 입력 폼 스타일 */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 6px;
+      margin-left: 4px;
+    }
+
+    .form-control {
+      width: 100%;
+      height: 48px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      background-color: #f8fafc;
+      padding: 0 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1e293b;
+      outline: none;
+      transition: all 0.2s ease;
+      appearance: none;
+    }
+
+    .form-control:focus {
+      border-color: #3b82f6;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    select.form-control {
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2064748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px;
+    }
+
+    /* 5. 파란색 라운드 필(Pill) 버튼 */
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .btn-submit {
+      background-color: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 12px 36px;
+      border-radius: 9999px;
+      border: none;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 160px;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.97);
+      background-color: #1d4ed8;
+    }
+
+    /* 6. 결과 화면 스타일 */
+    .check-icon-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+      color: #ffffff;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .res-box {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 14px 18px;
+      margin-top: 14px;
+    }
+
+    .res-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .res-row:last-child {
+      border-bottom: none;
+    }
+
+    .res-label {
+      color: #64748b;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .res-val {
+      color: #0f172a;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .badge-blue {
+      background-color: #eff6ff;
+      color: #2563eb;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 4px 14px;
+      border-radius: 9999px;
+    }
+
+    .badge-green {
+      background-color: #f0fdf4;
+      color: #16a34a;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 4px 14px;
+      border-radius: 9999px;
+    }
+
+    /* 메시지 및 로딩 */
+    .alert-error {
+      background-color: #fef2f2;
+      color: #ef4444;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      display: none;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="header">
+      <div class="logo-box">
+        <img src="https://lh3.googleusercontent.com/d/1qRvmGoexXsmzAu5zpBR0Gb6y7a1hn1bv" 
+             onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1qRvmGoexXsmzAu5zpBR0Gb6y7a1hn1bv&sz=w500';" 
+             class="logo-img" alt="로고">
+      </div>
+      <h2 class="title">울산피클볼협회</h2>
+      <p class="subtitle">회원인증 서비스</p>
+    </div>
+
+    <div id="page-input">
+      <p class="description">회원 정보를 입력하고 자격을 확인하세요</p>
+      
+      <div class="card">
+        <div id="error-msg" class="alert-error"></div>
+
+        <form id="auth-form" onsubmit="handleAuth(event)">
+          <div class="form-group">
+            <label for="facility">🏥 협약기관</label>
+            <select id="facility" class="form-control" required>
+              <option value="참바른병원">참바른병원</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="userName">👤 성명</label>
+            <input type="text" id="userName" class="form-control" placeholder="홍길동" required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="birth">📅 생년월일 (6자리)</label>
+            <input type="tel" id="birth" class="form-control" placeholder="980301" maxlength="6" pattern="[0-9]{6}" required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="phoneLast4">📱 전화번호 뒷 4자리</label>
+            <input type="tel" id="phoneLast4" class="form-control" placeholder="1234" maxlength="4" pattern="[0-9]{4}" required autocomplete="off">
+          </div>
+
+          <div class="btn-container">
+            <button type="submit" id="btn-submit" class="btn-submit">인증하기</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="page-result" class="hidden">
+      <div class="card">
+        <div style="text-align: center; margin-bottom: 14px;">
+          <span id="res-facility-badge" class="badge-blue">참바른병원 제출용</span>
+        </div>
+        
+        <div style="text-align: center;">
+          <div class="check-icon-circle">✓</div>
+          <div style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 2px;">인증 완료</div>
+          <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">정상적으로 회원 정보가 확인되었습니다</div>
+        </div>
+
+        <div class="res-box">
+          <div class="res-row">
+            <span class="res-label">소속 클럽</span>
+            <span id="res-club" class="badge-blue" style="font-size:0.75rem;">-</span>
+          </div>
+          <div class="res-row">
+            <span class="res-label">이름</span>
+            <span id="res-name" class="res-val">-</span>
+          </div>
+          <div class="res-row">
+            <span class="res-label">생년월일</span>
+            <span id="res-birth" class="res-val">-</span>
+          </div>
+          <div class="res-row">
+            <span class="res-label">전화번호</span>
+            <span id="res-phone" class="res-val">-</span>
+          </div>
+          <div class="res-row">
+            <span class="res-label">회원상태</span>
+            <span id="res-status" class="badge-green">정회원</span>
+          </div>
+          <div class="res-row">
+            <span class="res-label">가입일</span>
+            <span id="res-joindate" class="res-val">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-container">
+        <button type="button" class="btn-submit" onclick="resetForm()">다시 인증하기</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 상단에서 설정한 GAS_WEB_APP_URL 변수를 그대로 사용합니다.
+
+    // 초기 실행: 협약기관 목록 로드
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchFacilities();
+    });
+
+    // 협약기관 목록 불러오기 API
+    function fetchFacilities() {
+      if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("★")) return;
+
+      fetch(`${GAS_WEB_APP_URL}?action=getFacilities`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.facilities.length > 0) {
+            const selectEl = document.getElementById('facility');
+            selectEl.innerHTML = '';
+            data.facilities.forEach(fac => {
+              const opt = document.createElement('option');
+              opt.value = fac;
+              opt.textContent = fac;
+              selectEl.appendChild(opt);
+            });
+          }
+        })
+        .catch(err => console.error("기관 목록 로드 실패:", err));
+    }
+
+    // 회원 인증 처리
+    function handleAuth(event) {
+      event.preventDefault();
+
+      const facility = document.getElementById('facility').value;
+      const userName = document.getElementById('userName').value.trim();
+      const birth = document.getElementById('birth').value.trim();
+      const phoneLast4 = document.getElementById('phoneLast4').value.trim();
+      
+      const errorEl = document.getElementById('error-msg');
+      const btnSubmit = document.getElementById('btn-submit');
+
+      errorEl.style.display = 'none';
+
+      if (birth.length !== 6 || isNaN(birth)) {
+        showError("생년월일 6자리를 올바르게 입력해주세요.");
+        return;
+      }
+      if (phoneLast4.length !== 4 || isNaN(phoneLast4)) {
+        showError("전화번호 뒷 4자리를 올바르게 입력해주세요.");
+        return;
+      }
+
+      // 로딩 상태 변환
+      btnSubmit.textContent = "확인 중...";
+      btnSubmit.disabled = true;
+
+      const requestUrl = `${GAS_WEB_APP_URL}?action=verifyMember&facility=${encodeURIComponent(facility)}&name=${encodeURIComponent(userName)}&birth=${encodeURIComponent(birth)}&phoneLast4=${encodeURIComponent(phoneLast4)}`;
+
+      fetch(requestUrl)
+        .then(res => res.json())
+        .then(data => {
+          btnSubmit.textContent = "인증하기";
+          btnSubmit.disabled = false;
+
+          if (data.success && data.data) {
+            renderResult(data.data);
+          } else {
+            showError(data.message || "❌ 일치하는 회원 정보가 없습니다.");
+          }
+        })
+        .catch(err => {
+          btnSubmit.textContent = "인증하기";
+          btnSubmit.disabled = false;
+          showError("서버통신 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+        });
+    }
+
+    // 결과 데이터 화면 표시
+    function renderResult(info) {
+      document.getElementById('res-facility-badge').textContent = `${info.facility} 제출용`;
+      document.getElementById('res-club').textContent = info.clubs || "-";
+      document.getElementById('res-name').textContent = info.name;
+      document.getElementById('res-birth').textContent = info.birth;
+      document.getElementById('res-phone').textContent = info.phone;
+      document.getElementById('res-status').textContent = info.status;
+      document.getElementById('res-joindate').textContent = info.joinDate;
+
+      document.getElementById('page-input').classList.add('hidden');
+      document.getElementById('page-result').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+
+    // 초기화 및 다시 인증
+    function resetForm() {
+      document.getElementById('auth-form').reset();
+      document.getElementById('page-result').classList.add('hidden');
+      document.getElementById('page-input').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+
+    function showError(msg) {
+      const errorEl = document.getElementById('error-msg');
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
