@@ -11,88 +11,47 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for Modern UI & Hiding Streamlit Branding
+# Custom CSS: Modern 2026 App UI Style & Hide Streamlit Branding
 st.markdown("""
 <style>
-    /* Streamlit 브랜드 및 헤더/푸터 숨기기 */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* Hide Streamlit Elements */
+    #MainMenu, footer, header {visibility: hidden;}
     
-    /* 기본 배경 */
+    /* Background & Container */
     .stApp {
-        background-color: #f8fafc;
+        background-color: #f1f5f9;
     }
     .main .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
-        max-width: 480px;
+        max-width: 440px;
     }
 
-    /* 입력 폼 영역 깔끔한 카드로 감싸기 */
+    /* Input Form Styling */
     div[data-testid="stForm"] {
         background-color: #ffffff;
-        border-radius: 16px;
+        border-radius: 20px;
         padding: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         border: 1px solid #e2e8f0;
     }
 
-    /* 결과 출력 카드 컨테이너 */
-    .result-card {
-        background-color: #ffffff;
-        border: 2px solid #22c55e;
-        border-radius: 20px;
-        padding: 24px;
-        box-shadow: 0 10px 25px rgba(34, 197, 94, 0.12);
-    }
-
-    /* 테이블 행 정렬 보장 */
-    .info-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-    .info-table tr {
-        border-bottom: 1px dashed #e2e8f0;
-    }
-    .info-table tr:last-child {
-        border-bottom: none;
-    }
-    .info-table td {
-        padding: 12px 4px;
-        vertical-align: middle;
-    }
-    .td-label {
-        color: #64748b;
-        font-weight: 600;
-        font-size: 0.95rem;
-        text-align: left;
-        width: 35%;
-    }
-    .td-value {
-        color: #0f172a;
-        font-weight: 700;
-        font-size: 1rem;
-        text-align: right;
-        width: 65%;
-    }
-
-    /* 버튼 스타일 */
+    /* Buttons */
     .stButton > button {
         width: 100%;
-        background-color: #2563eb;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         color: white;
         font-weight: 700;
         font-size: 1.05rem;
-        padding: 0.75rem;
-        border-radius: 12px;
+        padding: 0.8rem;
+        border-radius: 14px;
         border: none;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
         transition: all 0.2s ease;
     }
     .stButton > button:hover {
-        background-color: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -113,10 +72,9 @@ if 'auth_result' not in st.session_state:
 # PAGE 1: 회원 인증 입력 화면
 # ----------------------------------------------------
 if st.session_state.page == 'input':
-    st.markdown("<h2 style='text-align: center; color: #0f172a; font-weight: 800; margin-bottom: 4px;'>울산피클볼협회 회원 인증</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 24px;'>협약기관 이용을 위한 본인 확인 서비스</p>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #0f172a; font-weight: 800; margin-bottom: 2px;'>울산피클볼협회</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b; font-size: 0.95rem; font-weight: 600; margin-bottom: 24px;'>모바일 회원 인증 서비스</p>", unsafe_allow_html=True)
 
-    # 이용기관 목록 불러오기
     try:
         config_df = load_data("설정")
         facility_list = config_df.iloc[:, 0].dropna().tolist()
@@ -125,17 +83,15 @@ if st.session_state.page == 'input':
     except Exception:
         facility_list = ["참바른병원"]
 
-    # 입력 폼 시작
     with st.form("auth_form", clear_on_submit=False):
         selected_facility = st.selectbox("🏥 이용할 협약기관", facility_list)
-        user_name = st.text_input("👤 이름", placeholder="홍길동").strip()
-        birth_input = st.text_input("📅 생년월일 6자리 (예: 980101)", placeholder="831215", max_chars=6).strip()
-        phone_last4 = st.text_input("📱 전화번호 뒷 4자리", placeholder="2328", max_chars=4).strip()
+        user_name = st.text_input("👤 이름", placeholder="예: 홍길동").strip()
+        birth_input = st.text_input("📅 생년월일 6자리 (예: 980101)", placeholder="980101", max_chars=6).strip()
+        phone_last4 = st.text_input("📱 전화번호 뒷 4자리", placeholder="1234", max_chars=4).strip()
         
-        st.markdown('<div style="margin-top: 12px;"></div>', unsafe_allow_html=True)
+        st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
         submit_button = st.form_submit_button("회원 인증 조회")
 
-    # 버튼 클릭 처리
     if submit_button:
         if not user_name:
             st.warning("이름을 입력해주세요.")
@@ -184,7 +140,6 @@ if st.session_state.page == 'input':
                         except Exception:
                             pass
 
-                        # 결과 화면 세션 저장
                         st.session_state.auth_result = {
                             "facility": selected_facility,
                             "name": user_name,
@@ -200,7 +155,6 @@ if st.session_state.page == 'input':
 
                     else:
                         st.error("❌ 일치하는 회원 정보가 없습니다. 입력한 정보를 확인해 주세요.")
-                        
                         try:
                             log_entry = pd.DataFrame([{
                                 "조회일시": current_time,
@@ -219,56 +173,45 @@ if st.session_state.page == 'input':
                     st.error(f"데이터베이스 연결 중 오류가 발생했습니다: {str(e)}")
 
 # ----------------------------------------------------
-# PAGE 2: 회원 인증 완료 결과 전용 화면 (줄맞춤 완벽 보장)
+# PAGE 2: 회원 인증 완료 결과 전용 화면 (Native Pure UI)
 # ----------------------------------------------------
 elif st.session_state.page == 'result':
     res = st.session_state.auth_result
     
-    st.markdown("<h2 style='text-align: center; color: #0f172a; font-weight: 800; margin-bottom: 16px;'>울산피클볼협회</h2>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #64748b; font-size: 1rem; font-weight: 700; margin-bottom: 12px;'>울산피클볼협회</h3>", unsafe_allow_html=True)
     
-    # HTML Table 구조로 구현하여 완벽한 행 높이 정렬
-    st.markdown(f"""
-    <div class="result-card">
-        <div style="background-color: #dcfce7; color: #15803d; font-weight: 700; font-size: 0.9rem; padding: 6px 16px; border-radius: 20px; text-align: center; width: fit-content; margin: 0 auto 12px auto;">
-            ✓ 회원 인증 완료
-        </div>
-        <div style="font-size: 1.8rem; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 4px;">
-            {res['name']} 회원님
-        </div>
-        <div style="font-size: 0.95rem; color: #64748b; text-align: center; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
-            🏥 {res['facility']} 이용 승인
-        </div>
+    # 렌더링 깨짐 현상을 방지하기 위한 Pure Streamlit Container
+    with st.container(border=True):
+        st.success("✓ 모바일 회원 인증 완료")
+        st.markdown(f"<h1 style='text-align: center; color: #0f172a; margin-top: 10px; margin-bottom: 2px;'>{res['name']} <span style='font-size: 1.2rem; font-weight: normal;'>회원님</span></h1>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align: center; color: #2563eb; font-weight: 700; margin-bottom: 15px;'>🏥 {res['facility']} 이용 승인</p>", unsafe_allow_html=True)
         
-        <table class="info-table">
-            <tr>
-                <td class="td-label">소속 클럽</td>
-                <td class="td-value">{res['clubs']}</td>
-            </tr>
-            <tr>
-                <td class="td-label">회원 자격</td>
-                <td class="td-value" style="color: #22c55e;">{res['status']}</td>
-            </tr>
-            <tr>
-                <td class="td-label">생년월일</td>
-                <td class="td-value">{res['birth']}</td>
-            </tr>
-            <tr>
-                <td class="td-label">연락처</td>
-                <td class="td-value">{res['phone']}</td>
-            </tr>
-            <tr>
-                <td class="td-label">가입일</td>
-                <td class="td-value">{res['join_date']}</td>
-            </tr>
-            <tr>
-                <td class="td-label">인증 일시</td>
-                <td class="td-value" style="font-size: 0.85rem; color: #64748b; font-weight: 500;">{res['time']}</td>
-            </tr>
-        </table>
-    </div>
-    """, unsafe_allow_html=True)
+        st.divider()
 
-    st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
+        # Pure Native Metrics/Columns로 완벽한 줄맞춤
+        items = [
+            ("소속 클럽", res['clubs']),
+            ("회원 자격", res['status']),
+            ("생년월일", res['birth']),
+            ("연락처", res['phone']),
+            ("가입일", res['join_date']),
+            ("인증 일시", res['time'])
+        ]
+
+        for label, val in items:
+            c1, c2 = st.columns([4, 6])
+            with c1:
+                st.markdown(f"<p style='color: #64748b; font-weight: 600; margin: 0;'>{label}</p>", unsafe_allow_html=True)
+            with c2:
+                if label == "회원 자격":
+                    st.markdown(f"<p style='text-align: right; color: #16a34a; font-weight: 800; margin: 0;'>{val}</p>", unsafe_allow_html=True)
+                elif label == "인증 일시":
+                    st.markdown(f"<p style='text-align: right; color: #94a3b8; font-size: 0.85rem; margin: 0;'>{val}</p>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"<p style='text-align: right; color: #0f172a; font-weight: 700; margin: 0;'>{val}</p>", unsafe_allow_html=True)
+            st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
     
     if st.button("🔄 다른 회원 조회하기"):
         st.session_state.page = 'input'
