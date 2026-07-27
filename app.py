@@ -17,50 +17,73 @@ LOGO_URL = f"https://lh3.googleusercontent.com/d/{FILE_ID}"
 LOGO_FALLBACK = f"https://drive.google.com/thumbnail?id={FILE_ID}&sz=w500"
 
 # ==========================================
-# 🎨 출력화면(스크린샷)과 100% 통일된 디자인 CSS
+# 🎨 전역 CSS (입력화면 & 출력화면 상단여백 0px 및 디자인 100% 통일)
 # ==========================================
 st.markdown("""
 <style>
-/* 1. 스트림릿 기본 UI 요소를 완벽 숨김 (우측 하단 배포 버튼 포함) */
-[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stAppDeployButton"], 
-.stDeployButton, footer, #MainMenu, .viewerBadge_container__1X33n, 
+/* 1. 스트림릿 기본 헤더, 툴바, 푸터, 배포 버튼 완벽 차단 */
+header[data-testid="stHeader"],
+[data-testid="stHeader"], 
+[data-testid="stToolbar"], 
+[data-testid="stAppDeployButton"],
+.stDeployButton,
+footer, 
+#MainMenu, 
+.viewerBadge_container__1X33n, 
 [data-testid="stDecoration"] {
     display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
     visibility: hidden !important;
 }
 
-/* 2. 상단 불필요한 여백 0px 박멸 - 모바일 최적화 */
+/* 2. 최상위 배경 및 모든 컨테이너 상단 여백 0px (모바일 스크롤 완벽 방지) */
 .stApp { 
     background-color: #f3f6f9 !important; 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
 
-.main .block-container {
-    padding-top: 0.5rem !important; /* 상단 여백 제거 */
-    padding-bottom: 2rem !important;
+div[data-testid="stAppViewContainer"],
+div[data-testid="stAppViewContainer"] > section {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+.main .block-container, 
+[data-testid="stMainBlockContainer"], 
+div[data-testid="stAppViewBlockContainer"] {
+    padding-top: 0.2rem !important; /* 모바일에서 최상단에 바짝 붙임 */
+    padding-bottom: 1.5rem !important;
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
     max-width: 420px !important;
     margin: 0 auto !important;
 }
 
-/* 3. 출력화면과 동일한 카드 디자인 */
+[data-testid="stVerticalBlock"] {
+    gap: 0.4rem !important;
+}
+
+/* 3. 카드형 디자인 (입력 폼 & 출력 카드 디자인 통일) */
 div[data-testid="stForm"], .result-card {
     background-color: #ffffff !important;
-    border-radius: 28px !important; /* 시안과 동일한 큰 라운드 */
+    border-radius: 28px !important;
     padding: 24px 20px !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
     border: none !important;
 }
 
-/* 4. 입력 필드 및 라벨 스타일 (출력화면 폰트 가이드 적용) */
+/* 4. 입력 필드 라벨 & 박스 스타일 (출력화면 폰트 가이드와 일치) */
 div[data-testid="stForm"] label {
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
     font-weight: 700 !important;
-    color: #475569 !important; /* Gray 600 */
-    margin-bottom: 6px !important;
-    margin-left: 4px !important;
+    color: #475569 !important;
+    margin-bottom: 4px !important;
 }
 
-/* 입력창 내부 디자인 - 이중 테두리 제거 및 시안 폰트 적용 */
 div[data-baseweb="input"], div[data-baseweb="select"] > div {
     border-radius: 14px !important;
     border: 1px solid #e2e8f0 !important;
@@ -68,45 +91,55 @@ div[data-baseweb="input"], div[data-baseweb="select"] > div {
     box-shadow: none !important;
     outline: none !important;
 }
+
 div[data-baseweb="input"]:focus-within, div[data-baseweb="select"] > div:focus-within {
     border-color: #3b82f6 !important;
     background-color: #ffffff !important;
 }
+
 div[data-baseweb="base-input"] > input {
-    color: #1e293b !important; /* Indigo 900 */
+    color: #1e293b !important;
     font-weight: 700 !important;
-    font-size: 1rem !important;
+    font-size: 0.95rem !important;
 }
 
-/* 영문 안내 문구 차단 */
+/* 영문 안내 문구 숨기기 */
 div[data-testid="InputInstructions"], [data-testid="stInputInstruction"] {
     display: none !important;
 }
 
-/* 5. 중앙 정렬 파란색 라운드 버튼 (시안과 100% 일치) */
+/* 5. 파란색 라운드 버튼 (입력/출력 공통 통일) */
 div[data-testid="stFormSubmitButton"] {
     display: flex !important;
     justify-content: center !important;
     margin-top: 10px !important;
 }
+
+.stButton {
+    display: flex !important;
+    justify-content: center !important;
+}
+
 .stButton > button {
-    background-color: #2563eb !important; /* 시안과 동일한 파란색 */
+    background-color: #2563eb !important;
     color: #ffffff !important;
     font-weight: 700 !important;
-    font-size: 1.05rem !important;
+    font-size: 1rem !important;
     padding: 0.7rem 2.5rem !important;
-    border-radius: 9999px !important; /* 필(Pill) 디자인 */
+    border-radius: 9999px !important;
     border: none !important;
     box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3) !important;
     transition: all 0.2s ease !important;
     width: auto !important;
-}
-.stButton > button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4) !important;
+    min-width: 150px !important;
 }
 
-/* 6. 결과 화면(출력) 데이터 박스 디자인 */
+.stButton > button:hover {
+    background-color: #1d4ed8 !important;
+    transform: translateY(-1px);
+}
+
+/* 6. 결과 리스트 박스 */
 .res-box {
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
@@ -122,8 +155,8 @@ div[data-testid="stFormSubmitButton"] {
     border-bottom: 1px solid #f1f5f9;
 }
 .res-row:last-child { border-bottom: none; }
-.res-label { color: #64748b; font-size: 0.9rem; font-weight: 600; }
-.res-val { color: #0f172a; font-size: 1rem; font-weight: 800; }
+.res-label { color: #64748b; font-size: 0.88rem; font-weight: 600; }
+.res-val { color: #0f172a; font-size: 0.95rem; font-weight: 800; }
 .badge-blue { background-color: #eff6ff; color: #2563eb; font-weight: 800; font-size: 0.82rem; padding: 4px 14px; border-radius: 9999px; }
 .badge-green { background-color: #f0fdf4; color: #16a34a; font-weight: 800; font-size: 0.82rem; padding: 4px 14px; border-radius: 9999px; }
 </style>
@@ -141,21 +174,21 @@ if 'auth_result' not in st.session_state:
     st.session_state.auth_result = None
 
 # ==========================================
-# ⚠️ 코드 노출 방지를 위해 HTML 내 들여쓰기 100% 제거
+# ⚠️ 들여쓰기 100% 제거된 헤더 HTML
 # ==========================================
 def render_header():
-    html_header = f"""<div style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
-<div style="display: inline-block; width: 84px; height: 84px; background-color: #ffffff; border-radius: 42px; padding: 4px; box-shadow: 0 6px 16px rgba(0,0,0,0.06); margin-bottom: 12px;">
+    html_header = f"""<div style="text-align: center; margin-top: 0px; margin-bottom: 16px;">
+<div style="display: inline-block; width: 80px; height: 80px; background-color: #ffffff; border-radius: 40px; padding: 4px; box-shadow: 0 6px 16px rgba(0,0,0,0.06); margin-bottom: 8px;">
 <img src="{LOGO_URL}" onerror="this.onerror=null; this.src='{LOGO_FALLBACK}';" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
 </div>
-<h2 style="font-weight: 800; color: #0f172a; margin: 0; font-size: 1.5rem; letter-spacing: -0.5px;">울산피클볼협회</h2>
-<p style="font-weight: 700; color: #3b82f6; margin-top: 4px; margin-bottom: 0; font-size: 1.05rem;">회원인증 서비스</p>
+<h2 style="font-weight: 800; color: #0f172a; margin: 0; font-size: 1.45rem; letter-spacing: -0.5px;">울산피클볼협회</h2>
+<p style="font-weight: 700; color: #3b82f6; margin-top: 3px; margin-bottom: 0; font-size: 1rem;">회원인증 서비스</p>
 </div>"""
     st.markdown(html_header, unsafe_allow_html=True)
 
 
 # ----------------------------------------------------
-# PAGE 1: 회원 인증 입력 화면 (시안과 동일하게 변경)
+# PAGE 1: 회원 인증 입력 화면
 # ----------------------------------------------------
 if st.session_state.page == 'input':
     with st.container():
@@ -211,7 +244,6 @@ if st.session_state.page == 'input':
                         join_date = first_row.get('가입일', '-')
                         full_phone = first_row.get('연락처', f"010-****-{phone_last4}")
 
-                        # 이용기록 저장
                         try:
                             log_entry = pd.DataFrame([{
                                 "조회일시": current_time,
@@ -247,16 +279,16 @@ elif st.session_state.page == 'result':
         render_header()
         
         result_html = f"""<div class="result-card">
-<div style="text-align: center; margin-bottom: 16px;">
+<div style="text-align: center; margin-bottom: 14px;">
 <span class="badge-blue">{res['facility']} 제출용</span>
 </div>
-<div style="text-align: center; margin-bottom: 10px;">
-<div style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);">
+<div style="text-align: center; margin-bottom: 8px;">
+<div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);">
 <span style="color: #ffffff; font-size: 1.5rem; font-weight: bold;">✓</span>
 </div>
 </div>
 <div style="text-align: center; font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 2px;">인증 완료</div>
-<div style="text-align: center; font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">정상적으로 회원 정보가 확인되었습니다</div>
+<div style="text-align: center; font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">정상적으로 회원 정보가 확인되었습니다</div>
 <div class="res-box">
 <div class="res-row"><span class="res-label">소속 클럽</span><span class="badge-blue" style="font-size:0.75rem;">{res['clubs']}</span></div>
 <div class="res-row"><span class="res-label">이름</span><span class="res-val">{res['name']}</span></div>
@@ -268,9 +300,8 @@ elif st.session_state.page == 'result':
 </div>"""
         st.markdown(result_html, unsafe_allow_html=True)
 
-        st.markdown("<div style='margin-top: 20px; display:flex; justify-content:center;'>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         if st.button("다시 인증하기"):
             st.session_state.page = 'input'
             st.session_state.auth_result = None
             st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
