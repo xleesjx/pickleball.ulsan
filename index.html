@@ -7,7 +7,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>울산피클볼협회 회원 인증</title>
+  <title>울산광역시피클볼협회 회원 인증</title>
   <style>
     /* 1. 리셋 및 기본 설정 (상단 여백 0px 완벽 구현) */
     * {
@@ -171,6 +171,83 @@
       margin-bottom: 8px;
     }
 
+    /* 안내(정회원 아님/정보없음) 화면 아이콘 */
+    .notice-icon-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background-color: #f59e0b;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+      color: #ffffff;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .notice-message {
+      text-align: center;
+      color: #475569;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      padding: 0 4px;
+    }
+
+    /* 성공 화면 하단 버튼 두 개 나란히 배치 */
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-outline {
+      background-color: #ffffff;
+      color: #2563eb;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 12px 28px;
+      border-radius: 9999px;
+      border: 1.5px solid #2563eb;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 130px;
+    }
+
+    .btn-outline:active {
+      transform: scale(0.97);
+      background-color: #eff6ff;
+    }
+
+    /* 혜택보기 펼침 영역 */
+    .benefit-box {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin-top: 14px;
+    }
+
+    .benefit-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #2563eb;
+      margin-bottom: 6px;
+    }
+
+    .benefit-text {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
     .res-box {
       background-color: #ffffff;
       border: 1px solid #e2e8f0;
@@ -248,7 +325,7 @@
              onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1qRvmGoexXsmzAu5zpBR0Gb6y7a1hn1bv&sz=w500';" 
              class="logo-img" alt="로고">
       </div>
-      <h2 class="title">울산피클볼협회</h2>
+      <h2 class="title">울산광역시피클볼협회</h2>
       <p class="subtitle">회원인증 서비스</p>
     </div>
 
@@ -325,6 +402,26 @@
             <span class="res-label">가입일</span>
             <span id="res-joindate" class="res-val">-</span>
           </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn-outline" id="btn-benefit" onclick="toggleBenefit()">혜택보기</button>
+        <button type="button" class="btn-submit" onclick="resetForm()">다시 인증하기</button>
+      </div>
+
+      <div id="benefit-area" class="benefit-box hidden">
+        <div class="benefit-title">📋 협약기관 혜택 안내</div>
+        <p id="benefit-text" class="benefit-text">-</p>
+      </div>
+    </div>
+
+    <div id="page-notice" class="hidden">
+      <div class="card">
+        <div style="text-align: center;">
+          <div class="notice-icon-circle">!</div>
+          <div style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">안내</div>
+          <p id="notice-message" class="notice-message">-</p>
         </div>
       </div>
 
@@ -414,9 +511,14 @@
           btnSubmit.textContent = "인증하기";
           btnSubmit.disabled = false;
 
-          if (data.success && data.data) {
+          if (data.resultType === "success" && data.data) {
+            // 정회원 인증 성공 → 상세 정보 + 혜택보기 화면
             renderResult(data.data);
+          } else if (data.resultType === "notice" || data.resultType === "notfound") {
+            // 준회원/휴면회원/탈퇴/정보없음 → 안내 화면 (혜택보기 없음)
+            renderNotice(data.message);
           } else {
+            // 그 외 예기치 못한 오류(입력값 누락, 서버측 설정 오류 등) → 입력 화면에 오류 메시지
             showError(data.message || "❌ 일치하는 회원 정보가 없습니다.");
           }
         })
@@ -427,7 +529,7 @@
         });
     }
 
-    // 결과 데이터 화면 표시
+    // 결과 데이터 화면 표시 (정회원 인증 성공)
     function renderResult(info) {
       document.getElementById('res-facility-badge').textContent = `${info.facility} 제출용`;
       document.getElementById('res-club').textContent = info.clubs || "-";
@@ -437,15 +539,52 @@
       document.getElementById('res-status').textContent = info.status;
       document.getElementById('res-joindate').textContent = info.joinDate;
 
+      // 혜택 문구 미리 채워두기 (버튼 누르기 전엔 숨김 상태 유지)
+      const benefitText = (info.benefit && info.benefit.trim() !== "")
+        ? info.benefit
+        : "등록된 혜택 정보가 없습니다.";
+      document.getElementById('benefit-text').textContent = benefitText;
+
+      // 새로 인증할 때마다 혜택보기 영역은 접힌 상태로 초기화
+      document.getElementById('benefit-area').classList.add('hidden');
+      document.getElementById('btn-benefit').textContent = "혜택보기";
+
       document.getElementById('page-input').classList.add('hidden');
+      document.getElementById('page-notice').classList.add('hidden');
       document.getElementById('page-result').classList.remove('hidden');
       window.scrollTo(0, 0);
+    }
+
+    // 안내 화면 표시 (준회원/휴면회원/탈퇴/정보없음 - 혜택보기 없음)
+    function renderNotice(message) {
+      document.getElementById('notice-message').textContent = message || "회원 정보를 확인해주세요.";
+
+      document.getElementById('page-input').classList.add('hidden');
+      document.getElementById('page-result').classList.add('hidden');
+      document.getElementById('page-notice').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+
+    // 혜택보기 펼치기/접기 토글
+    function toggleBenefit() {
+      const area = document.getElementById('benefit-area');
+      const btn = document.getElementById('btn-benefit');
+      const isHidden = area.classList.contains('hidden');
+
+      if (isHidden) {
+        area.classList.remove('hidden');
+        btn.textContent = "혜택 접기";
+      } else {
+        area.classList.add('hidden');
+        btn.textContent = "혜택보기";
+      }
     }
 
     // 초기화 및 다시 인증
     function resetForm() {
       document.getElementById('auth-form').reset();
       document.getElementById('page-result').classList.add('hidden');
+      document.getElementById('page-notice').classList.add('hidden');
       document.getElementById('page-input').classList.remove('hidden');
       window.scrollTo(0, 0);
     }
@@ -458,4 +597,3 @@
   </script>
 </body>
 </html>
-
