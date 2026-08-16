@@ -1,0 +1,52 @@
+name: Deploy to GitHub Pages
+
+# main 브랜치에 파일을 업로드/커밋할 때마다 자동으로 실행됩니다.
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Actions 탭에서 수동으로도 실행 가능
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: 실제 배포용 파일 만들기 (자리표시자 → 진짜 주소로 치환)
+        env:
+          GAS_WEB_APP_URL: ${{ secrets.GAS_WEB_APP_URL }}
+        run: |
+          set -e
+          if [ -z "$GAS_WEB_APP_URL" ]; then
+            echo "❌ GAS_WEB_APP_URL 시크릿이 설정되어 있지 않습니다. 저장소 Settings > Secrets and variables > Actions 에서 등록해주세요."
+            exit 1
+          fi
+          mkdir -p dist
+          # index.html 안의 __GAS_WEB_APP_URL__ 자리표시자를 실제 주소로 바꿔서 dist/ 폴더에 저장합니다.
+          sed "s|__GAS_WEB_APP_URL__|${GAS_WEB_APP_URL}|g" index.html > dist/index.html
+
+      - name: 결과물 업로드
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages로 배포
+        id: deployment
+        uses: actions/deploy-pages@v4
